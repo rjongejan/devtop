@@ -1,33 +1,24 @@
 FROM fedora:latest
-MAINTAINER Maxim B. Belooussov <belooussov@gmail.com>
-RUN dnf -y install man-pages && \
-    dnf -y groupinstall mate-desktop && \
-    dnf -y install \
-        dejavu-sans-fonts \
-        dejavu-serif-fonts \
-        terminus-fonts \
-        tigervnc-server \
-        tmux \
-        sudo \
-        xdotool \
+MAINTAINER Ruben Jongejan <ruben.jongejan@gmail.com>
+RUN dnf -y install \
+        @lxqt \
         xorg-x11-twm \
-        xterm \
-        xulrunner && \
-    dnf -y install \
+        tigervnc-server \
+        sudo \
+        man-pages \
         xrdp && \
-    dnf -y update && \
-    dnf clean all && \
-    mkdir -p /etc/sudoers.d && \
+    dnf clean all
+RUN mkdir -p /etc/sudoers.d && \
     useradd -G wheel devtop
 RUN echo 'devtop:password' | chpasswd
 RUN echo "devtop ALL = (root) NOPASSWD: ALL" > /etc/sudoers.d/devtop
-RUN echo "mate-session" > /etc/xrdp/startwm.sh
+RUN echo "startlxqt" > /etc/xrdp/startwm.sh
 RUN echo "#!/bin/bash" >/entrypoint.sh && \
     echo "# Copyright Maxim B. Belooussov <belooussov@gmail.com>" >>/entrypoint.sh && \
     echo "# generate a random machine id upon startup" >>/entrypoint.sh && \
     echo "openssl rand -out /etc/machine-id -hex 16" >>/entrypoint.sh && \
     echo "# start dbus" >>/entrypoint.sh && \
-    echo "dbus-daemon" >>/entrypoint.sh && \
+    #echo "dbus-daemon" >>/entrypoint.sh && \
     echo "# start xrdp session manager" >>/entrypoint.sh && \
     echo "xrdp-sesman" >>/entrypoint.sh && \
     echo "# and now start xrdp in the foreground" >>/entrypoint.sh && \
